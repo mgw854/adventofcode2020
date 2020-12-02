@@ -26,7 +26,7 @@ pub fn parse_input<T>(
 pub fn get_input_chars(
     day: u8,
 ) -> Result<Vec<char>, Box<dyn Error>> {
-    let mut contents = get_string(day)?
+    let mut contents = get_string(day)?;
       Ok(contents.trim()
       .chars()
       .collect::<Vec<char>>())

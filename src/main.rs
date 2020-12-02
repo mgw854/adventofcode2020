@@ -1,13 +1,13 @@
 use std::error::Error;
-mod day1;
+mod day2;
 mod helpers;
 
 fn main()-> Result<(), Box<dyn Error>> { 
 
-  let input : Vec<i32> = helpers::inputhandling::parse_input_per_line(1, |s| s.parse::<i32>().map_err(|e| e.into()))?;
+  let input : Vec<day2::PasswordPolicy> = helpers::inputhandling::parse_input_per_line(2, |s| s.parse::<day2::PasswordPolicy>().map_err(|e| e.into()))?;
 
-  dbg!(day1::find_2020_and_multiply_part1(input.clone()));
-  dbg!(day1::find_2020_and_multiply_part2(input.clone()));
+  dbg!(day2::get_valid_count(input));
+  //dbg!(day1::find_2020_and_multiply_part2(input.clone()));
 
   Ok(())
 }
