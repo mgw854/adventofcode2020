@@ -12,6 +12,7 @@ pub fn get_string(day: u8) -> Result<String, Box<dyn Error>> {
     Ok(contents)  
 }
 
+#[allow(dead_code)]
 pub fn parse_input<T>(
     day: u8,
     parser: fn(&str) -> Result<T, Box<dyn Error>>,
@@ -23,15 +24,17 @@ pub fn parse_input<T>(
         .collect()
 }
 
+#[allow(dead_code)]
 pub fn get_input_chars(
     day: u8,
 ) -> Result<Vec<char>, Box<dyn Error>> {
-    let mut contents = get_string(day)?;
+    let contents = get_string(day)?;
       Ok(contents.trim()
       .chars()
       .collect::<Vec<char>>())
 }
 
+#[allow(dead_code)]
 pub fn parse_input_per_line<T>(
     day: u8,
     parser: fn(&str) -> Result<T, Box<dyn Error>>,
@@ -42,6 +45,7 @@ pub fn parse_input_per_line<T>(
         .collect()
 }
 
+#[allow(dead_code)]
 pub fn parse_input_csv_per_line<T>(
     day: u8,
     parser: fn(&str) -> Result<T, Box<dyn Error>>,
@@ -52,6 +56,7 @@ pub fn parse_input_csv_per_line<T>(
         .collect()
 }
 
+#[allow(dead_code)]
 pub fn parse_csv_input<T>(
     day: u8,
     parser: fn(&str) -> Result<T, Box<dyn Error>>,
