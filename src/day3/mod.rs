@@ -1,4 +1,4 @@
-fn hit_trees(input: Vec<&str>, slope_x: usize, slope_y: usize) -> usize {
+pub fn hit_trees(input: Vec<&str>, slope_x: usize, slope_y: usize) -> usize {
   let y_max = input.len();
   let trees = convert_trees_to_points(input);
 
