@@ -1,4 +1,4 @@
-use regex::Regex;
+use regex::RegexBuilder;
 
 #[derive(Debug)]
 pub struct Passport
@@ -37,36 +37,37 @@ pub fn parse_and_validate_input(input: &str) -> Vec<Passport> {
   let inputs_collected = input.split("\n\n").collect::<Vec<&str>>();
   let mut passports : Vec<Passport> = Vec::new();
 
-  let byr_regex = Regex::new(r#"byr:(\d{4})"#).unwrap();
-  let iyr_regex = Regex::new(r#"iyr:(\d{4})"#).unwrap();
-  let eyr_regex = Regex::new(r#"eyr:(\d{4})"#).unwrap();
-  let ecl_regex = Regex::new(r#"ecl:(amb|blu|brn|gry|grn|hzl|oth)"#).unwrap();
-  let hcl_regex = Regex::new(r#"hcl:#[0-9a-f]{4}"#).unwrap();
-  let pid_regex = Regex::new(r#"pid:\d{9}"#).unwrap();
-  let hgt_regex = Regex::new(r#"hgt:(\d+)(cm|in)"#).unwrap();
+  let byr_regex = RegexBuilder::new(r#"^byr:(\d{4})$"#).multi_line(true).build().unwrap();
+  let iyr_regex = RegexBuilder::new(r#"^iyr:(\d{4})$"#).multi_line(true).build().unwrap();
+  let eyr_regex = RegexBuilder::new(r#"^eyr:(\d{4})$"#).multi_line(true).build().unwrap();
+  let ecl_regex = RegexBuilder::new(r#"^ecl:(amb|blu|brn|gry|grn|hzl|oth)$"#).multi_line(true).build().unwrap();
+  let hcl_regex = RegexBuilder::new(r#"^hcl:#[0-9a-f]{6}$"#).multi_line(true).build().unwrap();
+  let pid_regex = RegexBuilder::new(r#"^pid:\d{9}$"#).multi_line(true).build().unwrap();
+  let hgt_regex = RegexBuilder::new(r#"^hgt:(\d+)(cm|in)$"#).multi_line(true).build().unwrap();
 
   for val in inputs_collected {
+    let v = val.replace(" ", "\n") + "\n";
 
     passports.push(Passport {
-      byr: match byr_regex.captures(val) {
+      byr: match byr_regex.captures(&v) {
         Some(x) => (1920..=2002).contains( &x.get(1).unwrap().as_str().parse::<i32>().unwrap()),
         None => false
       },
-      iyr: match iyr_regex.captures(val) {
+      iyr: match iyr_regex.captures(&v) {
         Some(x) => (2010..=2020).contains( &x.get(1).unwrap().as_str().parse::<i32>().unwrap()),
         None => false
       },
-      eyr: match eyr_regex.captures(val) {
+      eyr: match eyr_regex.captures(&v) {
         Some(x) => (2020..=2030).contains( &x.get(1).unwrap().as_str().parse::<i32>().unwrap()),
         None => false
       },
-      hgt: match hgt_regex.captures(val) {
+      hgt: match hgt_regex.captures(&v) {
         Some(x) => validate_height(x.get(1).unwrap().as_str().parse::<i32>().unwrap(), x.get(2).unwrap().as_str()),
         None => false
       },
-      hcl: hcl_regex.is_match(val),
-      ecl: ecl_regex.is_match(val),
-      pid: pid_regex.is_match(val),
+      hcl: hcl_regex.is_match(&v),
+      ecl: ecl_regex.is_match(&v),
+      pid: pid_regex.is_match(&v),
       cid: val.contains("cid:")
     });
   }
@@ -124,9 +125,6 @@ pid:545766238 ecl:hzl
 eyr:2022
 
 iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719"##;
-
-    dbg!(input.split("\n\n").collect::<Vec<&str>>());
-    dbg!(parse_and_validate_input(input));
 
     assert_eq!(4, parse_and_validate_input(input).iter().map(|x| is_valid_passport(x)).filter(|x| *x).count());
   }

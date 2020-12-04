@@ -5,7 +5,7 @@ mod helpers;
 fn main()-> Result<(), Box<dyn Error>> { 
   let input = helpers::inputhandling::get_string(4).unwrap();
    
-  dbg!(day4::parse_input(&input).iter().map(|x| day4::is_valid_passport(x)).filter(|x| *x).count());
+  dbg!(day4::parse_and_validate_input(&input).iter().map(|x| day4::is_valid_passport(x)).filter(|x| *x).count());
 
   Ok(())
 }
