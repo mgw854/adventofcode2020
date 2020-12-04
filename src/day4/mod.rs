@@ -10,7 +10,7 @@ pub struct Passport
   cid: bool
 }
 
-fn parse_input(input: &str) -> Vec<Passport> {
+pub fn parse_input(input: &str) -> Vec<Passport> {
   let inputs_collected = input.split("\n\n").collect::<Vec<&str>>();
   let mut passports : Vec<Passport> = Vec::new();
 
@@ -30,7 +30,7 @@ fn parse_input(input: &str) -> Vec<Passport> {
   passports
 }
 
-fn is_valid_passport(input: &Passport) -> bool {
+pub fn is_valid_passport(input: &Passport) -> bool {
   input.byr && input.iyr && input.eyr && input.hgt && input.hcl && input.ecl && input.pid
 }
 

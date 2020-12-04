@@ -3,9 +3,9 @@ mod day4;
 mod helpers;
 
 fn main()-> Result<(), Box<dyn Error>> { 
-  let input = helpers::inputhandling::get_string(3).unwrap();
+  let input = helpers::inputhandling::get_string(4).unwrap();
    
-  //dbg!(day2::get_valid_count_part2(input));
+  dbg!(day4::parse_input(&input).iter().map(|x| day4::is_valid_passport(x)).filter(|x| *x).count());
 
   Ok(())
 }
