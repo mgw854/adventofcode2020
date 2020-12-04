@@ -1,3 +1,6 @@
+use regex::Regex;
+
+#[derive(Debug)]
 pub struct Passport
 {
   byr: bool,
@@ -30,8 +33,57 @@ pub fn parse_input(input: &str) -> Vec<Passport> {
   passports
 }
 
+pub fn parse_and_validate_input(input: &str) -> Vec<Passport> {
+  let inputs_collected = input.split("\n\n").collect::<Vec<&str>>();
+  let mut passports : Vec<Passport> = Vec::new();
+
+  let byr_regex = Regex::new(r#"byr:(\d{4})"#).unwrap();
+  let iyr_regex = Regex::new(r#"iyr:(\d{4})"#).unwrap();
+  let eyr_regex = Regex::new(r#"eyr:(\d{4})"#).unwrap();
+  let ecl_regex = Regex::new(r#"ecl:(amb|blu|brn|gry|grn|hzl|oth)"#).unwrap();
+  let hcl_regex = Regex::new(r#"hcl:#[0-9a-f]{4}"#).unwrap();
+  let pid_regex = Regex::new(r#"pid:\d{9}"#).unwrap();
+  let hgt_regex = Regex::new(r#"hgt:(\d+)(cm|in)"#).unwrap();
+
+  for val in inputs_collected {
+
+    passports.push(Passport {
+      byr: match byr_regex.captures(val) {
+        Some(x) => (1920..=2002).contains( &x.get(1).unwrap().as_str().parse::<i32>().unwrap()),
+        None => false
+      },
+      iyr: match iyr_regex.captures(val) {
+        Some(x) => (2010..=2020).contains( &x.get(1).unwrap().as_str().parse::<i32>().unwrap()),
+        None => false
+      },
+      eyr: match eyr_regex.captures(val) {
+        Some(x) => (2020..=2030).contains( &x.get(1).unwrap().as_str().parse::<i32>().unwrap()),
+        None => false
+      },
+      hgt: match hgt_regex.captures(val) {
+        Some(x) => validate_height(x.get(1).unwrap().as_str().parse::<i32>().unwrap(), x.get(2).unwrap().as_str()),
+        None => false
+      },
+      hcl: hcl_regex.is_match(val),
+      ecl: ecl_regex.is_match(val),
+      pid: pid_regex.is_match(val),
+      cid: val.contains("cid:")
+    });
+  }
+
+  passports
+}
+
 pub fn is_valid_passport(input: &Passport) -> bool {
   input.byr && input.iyr && input.eyr && input.hgt && input.hcl && input.ecl && input.pid
+}
+
+fn validate_height(height: i32, unit: &str) -> bool {
+  match unit {
+    "in" => (59..=76).contains(&height),
+    "cm" => (150..=193).contains(&height),
+    _ => false
+  }
 }
 
 #[cfg(test)]
@@ -56,6 +108,45 @@ iyr:2011 ecl:brn hgt:59in
 "##;
 
     assert_eq!(2, parse_input(input).iter().map(|x| is_valid_passport(x)).filter(|x| *x).count());
-    //assert_eq!(7, hit_trees(input.lines().collect(), 3, 1));
+  }
+
+  #[test]
+  fn day4_part2_valid() {
+    let input = r##"pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
+hcl:#623a2f
+
+eyr:2029 ecl:blu cid:129 byr:1989
+iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm
+
+hcl:#888785
+hgt:164cm byr:2001 iyr:2015 cid:88
+pid:545766238 ecl:hzl
+eyr:2022
+
+iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719"##;
+
+    dbg!(input.split("\n\n").collect::<Vec<&str>>());
+    dbg!(parse_and_validate_input(input));
+
+    assert_eq!(4, parse_and_validate_input(input).iter().map(|x| is_valid_passport(x)).filter(|x| *x).count());
+  }
+  #[test]
+  fn day4_part2_invalid() {
+    let input = r##"eyr:1972 cid:100
+hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
+
+iyr:2019
+hcl:#602927 eyr:1967 hgt:170cm
+ecl:grn pid:012533040 byr:1946
+
+hcl:dab227 iyr:2012
+ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277
+
+hgt:59cm ecl:zzz
+eyr:2038 hcl:74454a iyr:2023
+pid:3556412378 byr:2007
+"##;
+
+    assert_eq!(0, parse_and_validate_input(input).iter().map(|x| is_valid_passport(x)).filter(|x| *x).count());
   }
 }
