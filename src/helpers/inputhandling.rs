@@ -46,6 +46,17 @@ pub fn parse_input_per_line<T>(
 }
 
 #[allow(dead_code)]
+pub fn parse_input_between_blank_lines<T>(
+    day: u8,
+    parser: fn(&str) -> Result<T, Box<dyn Error>>,
+) -> Result<Vec<Vec<T>>, Box<dyn Error>> {
+    get_string(day)?
+        .split("\n\n")
+        .map(|s| s.lines().map(|x| parser(x.trim())).collect())
+        .collect()
+}
+
+#[allow(dead_code)]
 pub fn parse_input_csv_per_line<T>(
     day: u8,
     parser: fn(&str) -> Result<T, Box<dyn Error>>,

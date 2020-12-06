@@ -1,22 +1,10 @@
 use std::error::Error;
-use itertools::{Itertools, diff_with, Diff};
-mod day5;
+mod day6;
 mod helpers;
 
 fn main()-> Result<(), Box<dyn Error>> { 
-  let mut input = helpers::inputhandling::parse_input_per_line(5, |x| Ok(day5::get_seat_id(x))).unwrap();
-   
-  input.sort();
-  let min = *input.iter().min().unwrap();
-  let max = *input.iter().max().unwrap();
+  let mut input = helpers::inputhandling::parse_input_between_blank_lines(6, |x| Ok(x.chars().collect::<Vec<char>>())).unwrap();
 
-  if let Some(d) = diff_with(min..=max, input.iter(), |i, j| i == *j) {
-    match d {
-      Diff::FirstMismatch(_, i, _) => { dbg!(i); },
-      Diff::Shorter(_, i) => { dbg!(i); },
-      Diff::Longer(_, j) => { dbg!(j); }
-    }
-  }
-
+  dbg!(day6::count_answers(input));
   Ok(())
 }
