@@ -47,7 +47,7 @@ use std::collections::HashMap;
 pub fn get_answer(input: &str) -> u64 {
   let rules = merge_rules(input.lines().map(|l| parse_rule_map(l)).collect());
 
-  find_eventual_holders("shiny gold", &rules)
+  find_total_bags_inside("shiny gold", &rules)
 }
 
 fn parse_rule_map(input: &str) -> HashMap<String, Vec<Rule>> {
@@ -115,6 +115,20 @@ fn find_eventual_holders_recursive(color: &str, mut seen: &mut HashMap<String, (
   count
 }
 
+fn find_total_bags_inside(color: &str, rules: &HashMap<String, Vec<Rule>>) -> u64 {
+  let mut count = 0;
+
+  dbg!(color);
+  if let Some(v) = rules.get(color) {
+    for bags in v {
+      count += bags.count * (1 + find_total_bags_inside(&bags.color, rules));
+    }
+  }
+  dbg!(count);
+
+  count
+}
+
 #[derive(Debug)]
 pub struct Rule {
   count: u64,
@@ -129,8 +143,6 @@ mod tests {
   fn parse_rule_test() {
     let input = "light red bags contain 1 bright white bag, 2 muted yellow bags.";
     let map = parse_rule_map(input);
-
-    dbg!(map);
   }
 
   #[test]
@@ -148,5 +160,20 @@ dotted black bags contain no other bags.";
     let rules = merge_rules(input.lines().map(|l| parse_rule_map(l)).collect());
 
     assert_eq!(4, find_eventual_holders("shiny gold", &rules));
+  }
+
+  #[test]
+  fn day7_part2(){
+    let input = "shiny gold bags contain 2 dark red bags.
+dark red bags contain 2 dark orange bags.
+dark orange bags contain 2 dark yellow bags.
+dark yellow bags contain 2 dark green bags.
+dark green bags contain 2 dark blue bags.
+dark blue bags contain 2 dark violet bags.
+dark violet bags contain no other bags.";
+
+    let rules = merge_rules(input.lines().map(|l| parse_rule_map(l)).collect());
+    dbg!(&rules);
+    assert_eq!(126, find_total_bags_inside("shiny gold", &rules));
   }
 }
