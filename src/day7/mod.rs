@@ -44,6 +44,12 @@ fn parse_rule(input: &str) -> DiGraphMap<String, u64> {
 
 use std::collections::HashMap;
 
+pub fn get_answer(input: &str) -> u64 {
+  let rules = merge_rules(input.lines().map(|l| parse_rule_map(l)).collect());
+
+  find_eventual_holders("shiny gold", &rules)
+}
+
 fn parse_rule_map(input: &str) -> HashMap<String, Vec<Rule>> {
   let mut map = HashMap::<String, Vec<Rule>>::new();
   
