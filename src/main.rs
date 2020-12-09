@@ -3,8 +3,8 @@ mod day8;
 mod helpers;
 
 fn main()-> Result<(), Box<dyn Error>> { 
-  let mut input = helpers::inputhandling::get_string(8).unwrap();
+  let input = helpers::inputhandling::parse_input_per_line(8, |l| Ok(day8::AsmInstruction::parse(l))).unwrap();
 
-  //dbg!(day7::get_answer(&input));
+  dbg!(day8::execute(input));
   Ok(())
 }
