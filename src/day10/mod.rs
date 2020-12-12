@@ -139,11 +139,74 @@ pub fn solve(inputs: &Vec<u64>) -> u64 {
   count_diffs(sort_jolts(inputs))
 }
 
+fn sort_jolts_all_opts(adapters: &Vec<u64>) -> u64 {
+  let mut remaining : Vec<u64> = adapters.clone();
+  remaining.sort();
+  dbg!(&remaining);
+  // First, try to solve the end. Descend as far as we can 
+  let max_jolt = remaining.last().copied().unwrap();
+
+  remaining.pop();
+
+  let mut current_jolt = max_jolt;
+
+  loop {
+    let nearest = remaining.iter().filter(|x| (current_jolt - **x) <= 3).map(|x| *x).collect::<Vec<u64>>();
+
+    if nearest.len() == 1 {
+      current_jolt = nearest[0];
+      remaining.remove(remaining.binary_search(&current_jolt).unwrap());
+    } else if nearest.len() == 0 {
+      panic!();
+    }else {
+      // If we got here, that's as much back-tracking as we can do. Go forward now.
+      break;
+    }
+  }
+
+  jolt_descend_all(0, current_jolt, remaining)
+}
+
+fn jolt_descend_all(lower_bound: u64, upper_bound: u64, mut remaining: Vec<u64>) -> u64 {
+  let mut count = 1;
+  let mut current_jolt = lower_bound;
+
+  if current_jolt != 0 {
+    remaining.remove(remaining.binary_search(&current_jolt).unwrap());
+  }
+
+  loop {
+    if remaining.len() == 0 {
+      return count;
+    }
+
+    let nearest = remaining.iter().filter(|x| **x > current_jolt && (**x - current_jolt) <= 3).map(|x| *x).collect::<Vec<u64>>();
+
+    if nearest.len() == 1 {
+      current_jolt = nearest[0];
+      remaining.remove(remaining.binary_search(&current_jolt).unwrap());
+    } else if nearest.len() == 0 {
+      // You can't complete the puzzle; this isn't a valid path
+      return 0;
+    } else {
+      // We have multiple choices; descend as far as we can go
+      dbg!(remaining.iter().filter(|x| **x > current_jolt && (**x - current_jolt) <= 3).map(|x| *x).collect::<Vec<u64>>());
+      for opt in nearest {
+        dbg!(opt);
+        count += 1 + jolt_descend_all(opt, upper_bound, remaining.clone());
+      }
+
+      return count;
+    }
+  }
+}
+
+
 #[cfg(test)]
 mod tests {
   use super::*;
 
-  #[test]
+  //#[test]
   fn day10_part1() {
     let input = "16
     10
@@ -163,7 +226,7 @@ mod tests {
   }
 
   
-  #[test]
+ /// #[test]
   fn day10_part1b() {
     let input = "28
     33
@@ -201,4 +264,25 @@ mod tests {
 
     assert_eq!(220, count_diffs(sort_jolts(&jolts)));
   }
+
+  
+  #[test]
+  fn day10_part2() {
+    let input = "16
+    10
+    15
+    5
+    1
+    11
+    7
+    19
+    6
+    12
+    4";
+
+    let jolts : Vec<u64> = input.lines().map(|x| x.trim().parse().unwrap()).collect();
+
+    assert_eq!(8, sort_jolts_all_opts(&jolts));
+  }
+
 }
