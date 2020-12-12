@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use itertools::Itertools;
 
 fn sort_jolts(adapters: &Vec<u64>) -> Vec<u64> {
@@ -163,11 +164,14 @@ fn sort_jolts_all_opts(adapters: &Vec<u64>) -> u64 {
       break;
     }
   }
+  
+  let mut cache : HashMap<u64, u64> = HashMap::new();
 
-  jolt_descend_all(0, current_jolt, remaining)
+  jolt_descend_all(0, current_jolt, remaining, &mut cache)
 }
+use std::collections::hash_map::Entry;
 
-fn jolt_descend_all(lower_bound: u64, upper_bound: u64, mut remaining: Vec<u64>) -> u64 {
+fn jolt_descend_all(lower_bound: u64, upper_bound: u64, mut remaining: Vec<u64>, mut cache: &mut HashMap<u64, u64>) -> u64 {
   let mut current_jolt = lower_bound;
   let mut count = 1;
 
@@ -199,10 +203,18 @@ fn jolt_descend_all(lower_bound: u64, upper_bound: u64, mut remaining: Vec<u64>)
       //dbg!(current_jolt);
       let mut opt_count = 0;
       for opt in nearest {
-        let mut potential = remaining.clone();
-        potential.remove(potential.binary_search(&opt).unwrap());
 
-        opt_count += jolt_descend_all(opt, upper_bound, potential);
+        if let Entry::Occupied(e) = cache.entry(opt) {
+          opt_count += e.get();
+        }
+        else {
+          let mut potential = remaining.clone();
+          potential.remove(potential.binary_search(&opt).unwrap());
+  
+          let c = jolt_descend_all(opt, upper_bound, potential, &mut cache);
+          cache.insert(opt, c);
+          opt_count += c;
+        }
       }
 
       if (upper_bound - current_jolt) <= 3 {
