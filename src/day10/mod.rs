@@ -136,13 +136,13 @@ fn count_diffs(sorted_jolts: Vec<u64>) -> u64 {
 }
 
 pub fn solve(inputs: &Vec<u64>) -> u64 {
-  count_diffs(sort_jolts(inputs))
+  sort_jolts_all_opts(inputs)
 }
 
 fn sort_jolts_all_opts(adapters: &Vec<u64>) -> u64 {
   let mut remaining : Vec<u64> = adapters.clone();
   remaining.sort();
-  dbg!(&remaining);
+  //dbg!(&remaining);
   // First, try to solve the end. Descend as far as we can 
   let max_jolt = remaining.last().copied().unwrap();
 
@@ -168,35 +168,49 @@ fn sort_jolts_all_opts(adapters: &Vec<u64>) -> u64 {
 }
 
 fn jolt_descend_all(lower_bound: u64, upper_bound: u64, mut remaining: Vec<u64>) -> u64 {
-  let mut count = 1;
   let mut current_jolt = lower_bound;
-
-  if current_jolt != 0 {
-    remaining.remove(remaining.binary_search(&current_jolt).unwrap());
-  }
+  let mut count = 1;
 
   loop {
     if remaining.len() == 0 {
+      //dbg!("EOL");
       return count;
     }
 
     let nearest = remaining.iter().filter(|x| **x > current_jolt && (**x - current_jolt) <= 3).map(|x| *x).collect::<Vec<u64>>();
 
     if nearest.len() == 1 {
+      //dbg!(current_jolt);
+      if (upper_bound - current_jolt) <= 3 {
+        count += 1;
+      }
+
       current_jolt = nearest[0];
       remaining.remove(remaining.binary_search(&current_jolt).unwrap());
     } else if nearest.len() == 0 {
-      // You can't complete the puzzle; this isn't a valid path
-      return 0;
+      //dbg!(current_jolt);
+      if (upper_bound - current_jolt) <= 3 {
+        //count += 1;
+      }
+      return count;
     } else {
       // We have multiple choices; descend as far as we can go
-      dbg!(remaining.iter().filter(|x| **x > current_jolt && (**x - current_jolt) <= 3).map(|x| *x).collect::<Vec<u64>>());
+      //dbg!(remaining.iter().filter(|x| **x > current_jolt && (**x - current_jolt) <= 3).map(|x| *x).collect::<Vec<u64>>());
+      //dbg!(current_jolt);
+      let mut opt_count = 0;
       for opt in nearest {
-        dbg!(opt);
-        count += 1 + jolt_descend_all(opt, upper_bound, remaining.clone());
+        let mut potential = remaining.clone();
+        potential.remove(potential.binary_search(&opt).unwrap());
+
+        opt_count += jolt_descend_all(opt, upper_bound, potential);
       }
 
-      return count;
+      if (upper_bound - current_jolt) <= 3 {
+        opt_count += 1;
+      }
+
+      //dbg!(opt_count);
+      return count * opt_count;
     }
   }
 }
@@ -285,4 +299,43 @@ mod tests {
     assert_eq!(8, sort_jolts_all_opts(&jolts));
   }
 
+    
+  #[test]
+  fn day10_part2b() {
+    let input = "28
+    33
+    18
+    42
+    31
+    14
+    46
+    20
+    48
+    47
+    24
+    23
+    49
+    45
+    19
+    38
+    39
+    11
+    1
+    32
+    25
+    35
+    8
+    17
+    7
+    9
+    4
+    2
+    34
+    10
+    3";
+
+    let jolts : Vec<u64> = input.lines().map(|x| x.trim().parse().unwrap()).collect();
+
+    assert_eq!(19208, sort_jolts_all_opts(&jolts));
+  }
 }
