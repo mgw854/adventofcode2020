@@ -3,11 +3,11 @@ mod day11;
 mod helpers;
 
 fn main()-> Result<(), Box<dyn Error>> { 
-  //let mut input = helpers::inputhandling::parse_input_per_line(10, |l| Ok(l.parse::<u64>().unwrap())).unwrap();
+  let mut input = helpers::inputhandling::get_string(11).unwrap();
   //input.sort();
 
   //dbg!(input);
 
-  //dbg!(day10::solve(&input));
+  dbg!(day11::solve(&input));
   Ok(())
 }

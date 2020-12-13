@@ -115,6 +115,10 @@ impl<I> FindAdjacent for I where I: Iterator<Item = Seat>
   }
 }
 
+pub fn solve (input: &str) -> usize {
+  run_rules_until_stable(convert_input_to_points(input.lines().collect()))
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
