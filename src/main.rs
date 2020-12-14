@@ -8,6 +8,6 @@ fn main()-> Result<(), Box<dyn Error>> {
 
   //dbg!(input);
 
-  dbg!(day12::generate_position(&input));
+  dbg!(day12::generate_waypoint_position(&input));
   Ok(())
 }
