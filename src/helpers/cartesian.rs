@@ -8,8 +8,8 @@ pub struct Point2D {
 
 #[derive(Debug)]
 pub struct Slope2D {
-  pub dx: i32,
-  pub dy: i32
+  pub dx: i64,
+  pub dy: i64
 }
 
 impl Add<Slope2D> for Point2D {
@@ -20,4 +20,10 @@ impl Add<Slope2D> for Point2D {
     }
   }
   type Output = Point2D;
+}
+
+impl Point2D {
+  pub fn slope_between(&self, other: &Point2D) -> Slope2D {
+    Slope2D { dy: ((self.y as i64) - (other.y as i64)), dx: ((self.x as i64) - (other.x as i64)) }
+  }
 }

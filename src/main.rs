@@ -8,6 +8,6 @@ fn main()-> Result<(), Box<dyn Error>> {
 
   //dbg!(input);
 
-  dbg!(day11::solve(&input));
+  dbg!(day11::solve2(&input));
   Ok(())
 }
