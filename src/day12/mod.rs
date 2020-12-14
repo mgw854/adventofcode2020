@@ -104,6 +104,48 @@ pub fn generate_position(instructions: &Vec<NavigationInstruction>) -> i64 {
   x.abs() + y.abs()
 }
 
+
+pub fn generate_waypoint_position(instructions: &Vec<NavigationInstruction>) -> i64 {
+  let mut x : i64 = 0;
+  let mut y : i64 = 0;
+
+  let mut waypoint_x: i64 = 10;
+  let mut waypoint_y: i64 = 1;
+  
+  for instr in instructions {
+    match instr.direction {
+      Direction::Forward => {
+        x += waypoint_x * instr.run as i64;
+        y += waypoint_y * instr.run as i64;
+      },
+      Direction::North => { waypoint_y += instr.run as i64 },
+      Direction::South => { waypoint_y -= instr.run as i64 },
+      Direction::East => { waypoint_x += instr.run as i64 },
+      Direction::West => { waypoint_x -= instr.run as i64 },
+      Direction::Right => {
+        let mut rot = instr.run;
+        while rot > 0 {
+          let new_y = waypoint_x * -1;
+          waypoint_x = waypoint_y;
+          waypoint_y = new_y;   
+          rot -= 90;
+        };
+      },
+      Direction::Left => {
+        let mut rot = instr.run;
+        while rot > 0 {
+          let new_x = waypoint_y * -1;
+          waypoint_y = waypoint_x;
+          waypoint_x = new_x;
+          rot -= 90;
+        };
+      }
+    };
+  }
+
+  x.abs() + y.abs()
+}
+
 /*
 pub fn generate_positions(instructions: &Vec<WiringInstruction>) -> Vec<WirePosition> {
   let mut vec : Vec<WirePosition> = Vec::new();
@@ -195,5 +237,13 @@ mod tests {
 
       let instructions = input.lines().map(|x| NavigationInstruction::parse(x).unwrap()).collect();
       assert_eq!(25, generate_position(&instructions));
+    }
+
+    #[test]
+    fn day12_part2() {
+      let input = "F10\nN3\nF7\nR90\nF11";
+
+      let instructions = input.lines().map(|x| NavigationInstruction::parse(x).unwrap()).collect();
+      assert_eq!(286, generate_waypoint_position(&instructions));
     }
   }
