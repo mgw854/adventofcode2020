@@ -1,13 +1,13 @@
 use std::error::Error;
-mod day11;
+mod day12;
 mod helpers;
 
 fn main()-> Result<(), Box<dyn Error>> { 
-  let mut input = helpers::inputhandling::get_string(11).unwrap();
+  let input = helpers::inputhandling::parse_input_per_line(12, day12::NavigationInstruction::parse).unwrap();
   //input.sort();
 
   //dbg!(input);
 
-  dbg!(day11::solve2(&input));
+  dbg!(day12::generate_position(&input));
   Ok(())
 }
